@@ -1,25 +1,26 @@
 {% set name = "snakeviz" %}
-{% set version = "2.0.1" %}
+{% set version = "2.2.0" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: 80acc9c204aeb1e089f209a4c79bb5940dc40b6536a5184c1778a3f448634885
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/snakeviz-{{ version }}.tar.gz
+  sha256: 7bfd00be7ae147eb4a170a471578e1cd3f41f803238958b6b8efcf2c698a6aa9
 
 build:
-  number: 1
   entry_points:
     - snakeviz = snakeviz.cli:main
-  script: pip install . --no-deps --no-build-isolation --ignore-installed --no-cache-dir -vv
+  script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
+  number: 0
 
 requirements:
   host:
     - python
     - setuptools
-    - tornado >=2.0
+    - pip
+    - wheel
   run:
     - python
     - tornado >=2.0
@@ -28,7 +29,10 @@ test:
   imports:
     - snakeviz
   commands:
+    - pip check
     - snakeviz --help
+  requires:
+    - pip
 
 about:
   home: https://jiffyclub.github.io/snakeviz/
@@ -38,6 +42,5 @@ about:
   description: |
     SnakeViz is a browser based graphical viewer for the output of Python's
     cProfile module.
-  doc_url: http://jiffyclub.github.io/snakeviz/
-  doc_source_url: https://github.com/jiffyclub/snakeviz/tree/master/docs/docs
+  doc_url: https://jiffyclub.github.io/snakeviz/
   dev_url: https://github.com/jiffyclub/snakeviz
