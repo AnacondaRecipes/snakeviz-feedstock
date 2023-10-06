@@ -36,7 +36,8 @@ test:
 
 about:
   home: https://jiffyclub.github.io/snakeviz/
-  license: BSD
+  license: BSD-3-Clause
+  license_family: BSD
   license_file: LICENSE.txt
   summary: Web-based viewer for Python profiler output
   description: |
