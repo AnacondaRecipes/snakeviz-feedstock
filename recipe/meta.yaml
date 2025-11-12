@@ -1,41 +1,55 @@
 {% set name = "snakeviz" %}
-{% set version = "2.2.0" %}
+{% set version = "2.2.2" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/snakeviz-{{ version }}.tar.gz
-  sha256: 7bfd00be7ae147eb4a170a471578e1cd3f41f803238958b6b8efcf2c698a6aa9
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  sha256: 08028c6f8e34a032ff14757a38424770abb8662fb2818985aeea0d9bc13a7d83
 
 build:
-  entry_points:
-    - snakeviz = snakeviz.cli:main
   script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
   number: 0
+  skip: true  # [py<39]
+  entry_points:
+    - snakeviz = snakeviz.cli:main
 
 requirements:
   host:
     - python
-    - setuptools
-    - pip
+    - setuptools >=43
     - wheel
+    - pip
   run:
     - python
     - tornado >=2.0
 
+# [OSX] E requests.exceptions.HTTPError: 404 Client Error: Not Found for url: http://localhost:8080/snakeviz//pr...
+# [WIN] requests.exceptions.ConnectionError: HTTPConnectionPool(host='localhost', port=9999): Max retries exceeded with url: /snakeviz/C%3A%5CUsers%5Cta...
+{% set deselect_tests = "" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_snakeviz.py::test_snakeviz_profile" %}  # [osx or win]
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_snakeviz.py::test_snakeviz_dir" %}  # [osx or win]
+
 test:
+  source_files:
+    - tests
   imports:
     - snakeviz
   commands:
     - pip check
+    - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
+    - pytest -v tests {{ deselect_tests }}
     - snakeviz --help
   requires:
     - pip
+    - pytest
+    - requests
+    - ipython
 
 about:
-  home: https://jiffyclub.github.io/snakeviz/
+  home: https://jiffyclub.github.io/snakeviz
   license: BSD-3-Clause
   license_family: BSD
   license_file: LICENSE.txt
@@ -43,5 +57,5 @@ about:
   description: |
     SnakeViz is a browser based graphical viewer for the output of Python's
     cProfile module.
-  doc_url: https://jiffyclub.github.io/snakeviz/
+  doc_url: https://jiffyclub.github.io/snakeviz
   dev_url: https://github.com/jiffyclub/snakeviz
